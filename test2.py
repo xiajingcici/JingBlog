@@ -1,1 +1,0 @@
-print "HeyHey, Happy Thanksgiving!"
