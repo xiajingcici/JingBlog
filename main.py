@@ -1,8 +1,16 @@
 import webapp2
 
-class MainHandler(webapp2.RequestHandler):
-    def get(self):
-        self.response.write('Hello world!')
+from google.appengine.api import users
 
-app = webapp2.WSGIApplication([('/', MainHandler)],
+class MainPage(webapp2.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+
+    if user:
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.out.write('Hello, ' + user.nickname())
+    else:
+      self.redirect(users.create_login_url(self.request.uri))
+
+app = webapp2.WSGIApplication([('/', MainPage)],
                               debug=True)
