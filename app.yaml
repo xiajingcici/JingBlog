@@ -8,6 +8,10 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+- url: /templete/css
+  static_dir: templete/css
+- url: /templete/js
+  static_dir: templete/js
 
 - url: .*
   script: main.app

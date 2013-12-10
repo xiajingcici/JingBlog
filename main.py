@@ -43,7 +43,7 @@ class MainPage(webapp2.RequestHandler):
 
     }
 
-    template = jinja_environment.get_template('index.html')
+    template = jinja_environment.get_template('templete/temp.html')
     self.response.out.write(template.render(template_values))	
 	
 class Guestbook(webapp2.RequestHandler):
