@@ -1,0 +1,13 @@
+object names						
+user object	user_id	username	createtime	"source(google,facebook,twitter)"		
+blog object	blog_id	blogname	owner_id(user_id)	publishdatetime	modifydatetime	commentblog(father_blog_id)
+content object	seq	blog_id	content			
+tags object	tag_id	tag_name	user_id			
+visit object	visit_id	ipaddress	user_id			
+upvote object	blog_id	user_id				
+downvote object	blog_id	user_id				
+						
+						
+						
+relationship						
+userblog	blog_id	user_id				
