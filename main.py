@@ -15,16 +15,16 @@ class MainPage(webapp2.RequestHandler):
     user = users.get_current_user()
     if user:
       url = users.create_logout_url(self.request.uri)	
-      username = user.nickname()	  
-      url_linktext = 'Logout' 
+      greeting = 'Welcome Back, '+user.nickname()	  
+      url_linktext = 'Sign out' 
     else:
       url = users.create_login_url(self.request.uri)
-      username = ""
-      url_linktext = 'Login'
+      greeting = ""
+      url_linktext = 'Sign in or register'
 
     template_values = {      
       'url': url,
-      'username': username,
+      'greeting': greeting,
       'url_linktext': url_linktext
     }
 
