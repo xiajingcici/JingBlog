@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<title>on JingBlog</title>
+	<title>Manage Your Blogs</title>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">    
 	
     <!-- Latest compiled and minified CSS -->
@@ -14,7 +14,6 @@
 		}
 		.starter-template {
 		  padding: 40px 15px;
-		  text-align: center;
 		}
 	</style>
   </head>
@@ -57,7 +56,7 @@
                   </ul>
             </li>
 			<li><a href="/manageblog">Manage Your Blogs</a></li>            
-			<li><a href="/addblog">Create Blog</a></li>            
+			<li><a href="/addblog" class="active">Create Blog</a></li>            
           </ul>
 		  <ul class="nav navbar-nav pull-right">
             <li><a href="">{{ greeting }}</a></li>
@@ -66,13 +65,49 @@
         </div><!--/.nav-collapse -->
       </div>
     </div>
+	<script language="javascript" type="text/javascript">
+	function _edit(id){		
+		location = "/editblog?id="+id
+	}
+	function _delete(id){
+		location = "/deleteblog?id="+id
+	}	
+	</script>
 	<div class="container">
-
       <div class="starter-template">
-        <h1>Your blog on JingBlog</h1>
+	    <h1>Manage Your Blogs</h1>
 		{{ notice_area }}
-        <p class="lead">Use JingBlog to log your every moment.</p>
-		<!--<p><img src="http://www.cartrucktrader.com/images.aspx/id-527142044-w-492-h-369/2013-honda-civic-coupe-044-p1.jpg"/></p>-->
+        <form role="form" action="" method=POST>
+		  <div class="form-group">
+			<table class="table table-hover">
+				<tr>
+					<th>#</th>
+					<th>Blog Name</th>
+					<th>Blog Url</th>					
+					<th>Owner</th>
+					<th>CreateTime</th>
+					<th colspan=2>Manage</th>
+				</tr>				
+				{%if blogs%}
+					{% set count = 1 %}
+					{%for blog in blogs%}
+						<tr>
+							<td>{{ count }}</td>
+							<td>{{blog.blogname}}</td>
+							<td>{{blog.blog_url}}</td>
+							<td>{{blog.owner}}</td>
+							<td>{{blog.createtime}}</td>
+							<td><a href="#" class="btn btn-primary btn-xs" role="button" disabled onclick="_edit({{blog.key.id()}});return false;">Edit</a></td>
+							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_delete({{blog.key.id()}});return false;">Delete</a></td>
+						</tr>
+						{% set count = count + 1 %}
+					{%endfor%}
+				{%else%}
+				<tr><td colspan=7><B>You don't have any blog yet. <a href="/addblog">Add one Here!</a></B></td></tr>
+				{%endif%}
+			</table>
+		  </div>		  
+		</form>
       </div>
 	  <hr>
 

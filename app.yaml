@@ -12,7 +12,14 @@ handlers:
   static_dir: templete/css
 - url: /templete/js
   static_dir: templete/js
-
+- url: /addblog  
+  script: main.app
+  login: required
+  secure: always
+- url: /manageblog  
+  script: main.app
+  login: required
+  secure: always
 - url: .*
   script: main.app
 
