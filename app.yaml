@@ -20,6 +20,42 @@ handlers:
   script: main.app
   login: required
   secure: always
+- url: /editblog  
+  script: main.app
+  login: required
+  secure: always
+- url: /deleteblog  
+  script: main.app
+  login: required
+  secure: always
+- url: /addpost  
+  script: main.app
+  login: required
+  secure: always
+- url: /editpost  
+  script: main.app
+  login: required
+  secure: always  
+- url: /savepost  
+  script: main.app
+  login: required
+  secure: always    
+- url: /deletepost  
+  script: main.app
+  login: required
+  secure: always  
+- url: /managepost
+  script: main.app
+  login: required
+  secure: always  
+- url: /uploadphoto  
+  script: main.app
+  login: required
+  secure: always  
+- url: /managephoto
+  script: main.app
+  login: required
+  secure: always    
 - url: .*
   script: main.app
 

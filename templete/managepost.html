@@ -48,14 +48,14 @@
                     <li><a href="/addpost">Create Post</a></li>
                     <li><a href="/managepost">Manage Post</a></li>
                   </ul>
-            </li>
+            </li>     
 			<li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Your Images <b class="caret"></b></a>
                   <ul class="dropdown-menu">
                     <li><a href="/uploadphoto">Upload Image</a></li>
                     <li><a href="/managephoto">Manage Images</a></li>
                   </ul>
-            </li>			
+            </li>
           </ul>
 		  <ul class="nav navbar-nav pull-right">
             <li><a href="">{{ greeting }}</a></li>
@@ -65,48 +65,52 @@
       </div>
     </div>
 	<script language="javascript" type="text/javascript">
-	function _view(id){
-		location = "/viewblog/"+id
-	}		
+	function _view(id){		
+		location = "/viewpost/"+id
+	}
 	function _edit(id){		
-		location = "/editblog?id="+id
+		location = "/editpost/"+id
 	}
 	function _delete(id){
-		location = "/deleteblog?id="+id
+		location = "/deletepost/"+id
 	}	
 	</script>
 	<div class="container">
       <div class="starter-template">
-	    <h1>Manage Your Blogs</h1>
+	    <h1>Manage Your Posts</h1>
 		{{ notice_area }}
         <form role="form" action="" method=POST>
 		  <div class="form-group">
 			<table class="table table-hover">
 				<tr>
 					<th>#</th>
-					<th>Blog Name</th>
-					<th>Blog Url</th>					
+					<th>Article Title</th>
+					<th>Blog Name</th>					
 					<th>Owner</th>
-					<th>CreateTime</th>
-					<th colspan=2>Manage</th>
+					<th>Published Time</th>
+					<th>Editor</th>
+					<th>Modified Time</th>
+					<th colspan=3>Manage</th>
 				</tr>				
-				{%if blogs%}
+				{%if posts%}
 					{% set count = 1 %}
-					{%for blog in blogs%}
+					{%for post in posts%}
 						<tr>
 							<td>{{ count }}</td>
-							<td>{{blog.blogname}}</td>
-							<td>{{blog.blog_url}}</td>
-							<td>{{blog.owner}}</td>
-							<td>{{blog.createtime}}</td>
-							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_view({{blog.key.id()}});return false;">View</a></td>
-							<!--<td><a href="#" class="btn btn-primary btn-xs" role="button" disabled onclick="_edit({{blog.key.id()}});return false;">Edit</a></td>-->
-							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_delete({{blog.key.id()}});return false;">Delete</a></td>
+							<td>{{post.post_title}}</td>
+							<td>{{blogid_name[post.blog_id]}}</td>
+							<td>{{post.owner}}</td>
+							<td>{{post.publishdatetime}}</td>
+							<td>{{post.editor}}</td>
+							<td>{{post.lastmodifydatetime}}</td>
+							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_view({{post.key.id()}});return false;">View</a></td>
+							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_edit({{post.key.id()}});return false;">Edit</a></td>
+							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_delete({{post.key.id()}});return false;">Delete</a></td>
 						</tr>
 						{% set count = count + 1 %}
 					{%endfor%}
 				{%else%}
-				<tr><td colspan=7><B>You don't have any blog yet. <a href="/addblog">Add one Here!</a></B></td></tr>
+				<tr><td colspan=7><B>You don't have any post yet. <a href="/addpost">Add one Here!</a></B></td></tr>
 				{%endif%}
 			</table>
 		  </div>		  

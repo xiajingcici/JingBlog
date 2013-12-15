@@ -21,3 +21,29 @@ indexes:
   properties:
   - name: date
     direction: desc
+
+- kind: Post
+  properties:
+  - name: blog_id
+  - name: publishdatetime
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: blog_id
+  - name: tags
+  - name: publishdatetime
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: owner
+  - name: publishdatetime
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: owner
+  - name: publishdatetime
+    direction: desc
+  - name: blog_id
