@@ -5,14 +5,16 @@ import jinja2
 import os
 import re
 import datetime
-
+import PyRSS2Gen as RSS2
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
+from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
 from google.appengine.api import search
+#from google.appengine.api import images
 
 #https://developers.google.com/appengine/docs/python/mail/receivingmail   Handling Incoming Email
 
@@ -35,6 +37,12 @@ class Post(ndb.Model):
   tags = ndb.StringProperty(repeated=True)
   #https://developers.google.com/appengine/docs/python/ndb/queries#repeated_properties Querying for Repeated Properties
   
+class Photo(db.Model): 
+    owner = db.UserProperty()
+    #avatar = db.BlobProperty()
+    photo = db.BlobProperty()
+    createtime = db.DateTimeProperty(auto_now_add=True)
+    
 class MyUtil():
   def renderLogin(self,uri):
     user = users.get_current_user()
@@ -152,6 +160,37 @@ class DeleteBlog(webapp2.RequestHandler):
     else:
       self.redirect("/manageblog?alert=Delete Error. Please try again.")
 
+class RssBlog(webapp2.RequestHandler):
+  def get(self,blog_id):
+    blog = ndb.Key(Blog, int(blog_id)).get() 
+    if not blog:
+        self.error(404)
+    else:
+        rssitems = []
+        qry =Post.query(Post.blog_id==blog.key.id()).order(-Post.publishdatetime)
+        blogdesc = blog.blog_desc
+        if not blogdesc:
+            blogdesc = ""
+        for post in qry:
+            rssitem = RSS2.RSSItem(
+             title = post.post_title,
+             link = self.request.host_url+"/viewpost/"+str(post.key.id()),
+             description = "",
+             guid = RSS2.Guid(self.request.host_url+"/viewpost/"+str(post.key.id())),
+             pubDate = post.publishdatetime)
+            rssitems.append(rssitem)
+        rss = RSS2.RSS2(
+        title = blog.blogname+"'s Rss feed",
+        link = self.request.host_url+"/viewblog/"+str(blog.key.id()),
+        description = blogdesc+" A "
+                      "JingBlog generated RSS2 feeds",
+        lastBuildDate = datetime.datetime.now(),
+        generator = "JingBlog Platform",
+        items = rssitems)
+        rss_xml = rss.to_xml()
+        self.response.headers['Content-Type'] = 'application/rss+xml'
+        self.response.out.write(rss_xml)
+      
 class EditBlog(webapp2.RequestHandler):
   def get(self):
     self.redirect("/manageblog")
@@ -188,9 +227,17 @@ class ViewBlog(webapp2.RequestHandler):
                     posts.append(post)
             qry=posts
         if qry.count(11) > 10:
-            posts = qry.fetch(10)
-            oldlink = ""
-            template_values.update({'blog':blog,'posts':posts,'oldlink':oldlink})
+            old = self.request.get('old')
+            if old:
+                posts = qry.fetch(offset=10)
+                template_values.update({'blog':blog,'posts':posts,"old":old})
+            else:
+                posts = qry.fetch(10)
+                if tag:
+                    oldlink = self.request.uri+"&old=true"
+                else:
+                    oldlink = self.request.uri+"?old=true"
+                template_values.update({'blog':blog,'posts':posts,'oldlink':oldlink})            
         elif qry.count() == 0:
             template_values.update({'blog':blog})
         else:
@@ -199,7 +246,7 @@ class ViewBlog(webapp2.RequestHandler):
         template_values.update(MyUtil().renderLogin(self.request.uri))
         template = jinja_environment.get_template('templete/viewblog.html')
         self.response.out.write(template.render(template_values))
-
+        
 class AddPost(webapp2.RequestHandler):
   def get(self):    
     template_values={}
@@ -402,6 +449,79 @@ class DeletePost(webapp2.RequestHandler):
     template = jinja_environment.get_template('templete/managepost.html')
     self.response.out.write(template.render(template_values))
     
+class UploadPhoto(webapp2.RequestHandler):
+  def get(self):    
+    template_values={}
+    user = users.get_current_user()
+    template_values.update(MyUtil().renderLogin(self.request.uri))
+    template = jinja_environment.get_template('templete/uploadimg.html')
+    self.response.out.write(template.render(template_values))
+  def post(self):
+    template_values={}
+    img = self.request.get('img')
+    img_name = self.request.POST["img"].filename
+    if img_name.lower().endswith("jpg") or img_name.lower().endswith("png") or img_name.lower().endswith("gif"):        
+        if img:
+            user = users.get_current_user()
+            photo = Photo()
+            photo.owner = user
+            photo.photo = db.Blob(img)
+            #photo.avatar = db.Blob(images.resize(img, 100, 100))
+            photo.put()
+            template_values.update(MyUtil().renderSuccess("Your Image Uploaded Successful. Enjoy Blogging!"))
+        else:
+            template_values.update(MyUtil().renderAlert("Plase choose the image you want to upload."))
+    else:
+        template_values.update(MyUtil().renderAlert("Only jpg,png and/or gif photo are allowed to upload."))        
+    template_values.update(MyUtil().renderLogin(self.request.uri))
+    template = jinja_environment.get_template('templete/uploadimg.html')
+    self.response.out.write(template.render(template_values))
+ 
+class ManagePhoto(webapp2.RequestHandler):
+  def get(self):    
+    template_values={}
+    user = users.get_current_user()
+    photos = Photo.all()
+    photos.filter('owner =', user).order('-createtime')    
+    if photos.count()>0:
+        template_values.update({'photos':photos,'domain':self.request.host_url})
+    else:
+        template_values.update({'domain':self.request.host_url})    
+    template_values.update(MyUtil().renderLogin(self.request.uri))
+    template = jinja_environment.get_template('templete/managephoto.html')
+    self.response.out.write(template.render(template_values))
+
+class DeletePhoto(webapp2.RequestHandler):
+  def get(self,img_key):    
+    template_values={}
+    user = users.get_current_user()
+    photo = db.get(img_key)
+    if photo:
+        if photo.owner == user:
+            db.delete(photo)
+        else:
+            template_values.update(MyUtil().renderAlert("You cannot delete a photo that not belongs to you."))
+    else:
+        template_values.update(MyUtil().renderAlert("Cannot find the photo you are looking for."))
+    photos = Photo.all()
+    photos.filter('owner =', user).order('-createtime')   
+    if photos.count()>0:
+        template_values.update({'photos':photos,'domain':self.request.host_url})
+    else:
+        template_values.update({'domain':self.request.host_url})
+    template_values.update(MyUtil().renderLogin(self.request.uri))
+    template = jinja_environment.get_template('templete/managephoto.html')
+    self.response.out.write(template.render(template_values))
+    
+class Image(webapp2.RequestHandler):
+    def get(self,img_key):
+        photo = db.get(img_key)
+        if photo.photo:
+            self.response.headers['Content-Type'] = 'image/png'
+            self.response.out.write(photo.photo)
+        else:
+            self.error(404)    
+
 app = webapp2.WSGIApplication([
   ('/', MainPage),
   ('/addblog', AddBlog),
@@ -409,10 +529,15 @@ app = webapp2.WSGIApplication([
   ('/deleteblog', DeleteBlog),
   ('/editblog', EditBlog),
   (r'/viewblog/(\d+)', ViewBlog),
+  (r'/rssblog/(\d+)', RssBlog),
   ('/addpost', AddPost),
   ('/managepost', ManagePost),
   (r'/viewpost/(\d+)', ViewPost),  
   ('/savepost',SavePost),
   (r'/editpost/(\d+)', EditPost),
-  (r'/deletepost/(\d+)', DeletePost)
+  (r'/deletepost/(\d+)', DeletePost),
+  ('/uploadphoto',UploadPhoto),
+  ('/managephoto',ManagePhoto),
+  (r'/deleteimg/([A-Za-z0-9\-]+)', DeletePhoto),
+  (r'/img/([A-Za-z0-9\-]+)',Image)
 ])

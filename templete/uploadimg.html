@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<title>View your Blog on JingBlog</title>
+	<title>Upload your Images to JingBlog</title>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">    
 	
     <!-- Latest compiled and minified CSS -->
@@ -48,14 +48,14 @@
                     <li><a href="/addpost">Create Post</a></li>
                     <li><a href="/managepost">Manage Post</a></li>
                   </ul>
-            </li>      
+            </li>
 			<li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Your Images <b class="caret"></b></a>
                   <ul class="dropdown-menu">
                     <li><a href="/uploadphoto">Upload Image</a></li>
                     <li><a href="/managephoto">Manage Images</a></li>
                   </ul>
-            </li>			
+            </li>
           </ul>
 		  <ul class="nav navbar-nav pull-right">
             <li><a href="">{{ greeting }}</a></li>
@@ -63,69 +63,22 @@
           </ul>
         </div><!--/.nav-collapse -->
       </div>
-    </div>
+    </div>	
 	<div class="container">
-	<script language="javascript" type="text/javascript">
-	function _search(){		
-		if($('#textsearch').val()==""){
-			alert("Please don't search empty.");
-		}else{
-			location = "/viewblog/{{blog.key.id()}}?search="+$('#textsearch').val()
-		}
-	}
-	function _rss(){
-		window.open("/rssblog/{{blog.key.id()}}")
-	}
-	</script>
-      <div class="starter-template row">
-	    <h1>{{blog.blogname}}&nbsp;&nbsp;<small>&nbsp;&nbsp; owned by {{blog.owner}}</small></h1>
-		
-		{%if posts%}
-			<div class="title col-md-8">
-			{%for post in posts%}
-			<div class="title">
-			<h3>{{post.post_title}}</h3>
-			</div>		
-			<div class="info">
-				<pre>Author:&nbsp;{{post.owner}}&nbsp;&nbsp;|&nbsp;Published On:&nbsp;{{post.publishdatetime}}&nbsp;&nbsp;{% if post.editor %}|&nbsp;Editor:&nbsp;{{post.editor}}&nbsp;&nbsp;{% endif %}{% if post.lastmodifydatetime %}|&nbsp;Last Modified Time:&nbsp;{{post.lastmodifydatetime}}&nbsp;&nbsp;{% endif %}</pre>
-			</div>
-			<div class="content">
-				<p class="lead">{{post.contents[0]}}<BR/><BR/><a href="/viewpost/{{post.key.id()}}">read more on permalink...</a></p>
-			</div>
-			<div class="tags">
-				<pre>Tags:&nbsp;{{post.tags|join(', ')}}</pre>
-			</div>
-			{%endfor%}
-			{%if oldlink%}
-			<div class="old">
-			<p class="lead"><a href="{{oldlink}}">View More for older posts...</a></p>
-			</div>
-			{%endif%}
-			</div>
-			<div class="col-md-4">
-				<button type="button" class="btn btn-default" onclick="_rss();return false;">
-				  RSS for this blog
-				</button>
-			</div>
-			{%if old%}<div class="col-md-4"><h3>These are the older posts.&nbsp;&nbsp;<br/><a href="/viewblog/{{blog.key.id()}}">View Latest 10 Posts.</a></div>{%endif%}
-			{%if tag_filter%}<div class="col-md-4"><h3>Filtered By Tag:</h3><br/>{{tag_filter}}&nbsp;&nbsp;<a href="/viewblog/{{blog.key.id()}}">Remove Filter</a></div>{%endif%}
-			
-			<div class="col-md-4"><h3>Tags:</h3><br/>{{tags_str}}</div>
-			<div class="col-md-4"><h3>Content Fulltext Search:</h3><br/>			
-				<div class="input-group">
-				  <input type="text" class="form-control" id="textsearch" name="textsearch" placeholder="Enter your search words"/>
-				  <span class="input-group-btn">
-					<button class="btn btn-default" type="button" onclick="_search();return false;">Go!</button>
-				  </span>
-				</div>
-			</div>
-		{%else%}
-			<div><h3>This blog has no post yet.</h3></div>
-		{%endif%}
-		
+
+      <div class="starter-template">
+	    <h1>Upload image to your account</h1>
+		{{ notice_area }}
+        <form role="form" enctype="multipart/form-data" action="/uploadphoto" method=POST>
+		  <div class="form-group">
+			<label for="img">Upload Img</label>
+			<div><input type="file"  id="img" name="img" required/></div>
+			<span class="help-block">Please select the image from your local disk.</span>
+		  </div>
+		  <button type="submit" class="btn btn-default">Submit</button>
+		</form>
       </div>
 	  <hr>
-
 	  <footer>
 			<p>&copy; Powered by <a href='https://jingblogost.appspot.com' target='_blank'>JingBlog</a> 2013 & <a href='https://developers.google.com/appengine/' target='_blank'>Google App Engine Platform</a></p>
 	  </footer>

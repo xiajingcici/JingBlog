@@ -10,6 +10,8 @@ handlers:
   upload: favicon\.ico
 - url: /templete/css
   static_dir: templete/css
+- url: /templete/fonts
+  static_dir: templete/fonts
 - url: /templete/js
   static_dir: templete/js
 - url: /addblog  
@@ -56,6 +58,10 @@ handlers:
   script: main.app
   login: required
   secure: always    
+- url: /deletephoto
+  script: main.app
+  login: required
+  secure: always     
 - url: .*
   script: main.app
 

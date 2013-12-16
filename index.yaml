@@ -22,6 +22,12 @@ indexes:
   - name: date
     direction: desc
 
+- kind: Photo
+  properties:
+  - name: owner
+  - name: createtime
+    direction: desc
+
 - kind: Post
   properties:
   - name: blog_id
