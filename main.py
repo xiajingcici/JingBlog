@@ -23,7 +23,7 @@ from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 
 #https://developers.google.com/appengine/docs/python/mail/receivingmail   Handling Incoming Email
 
-class Blog(ndb.Model):  
+class Blog(ndb.Model):
   #blog_id = ndb.IntegerProperty() #seems don't need, GAE will create a unique key id every time you insert a new row
   blogname = ndb.StringProperty()
   blog_desc = ndb.StringProperty()
@@ -47,6 +47,24 @@ class Photo(db.Model):
     #avatar = db.BlobProperty()
     photo = db.BlobProperty()
     createtime = db.DateTimeProperty(auto_now_add=True)
+
+class BlogVisitLog(ndb.Model):
+    blog_id = ndb.IntegerProperty()
+    user = ndb.UserProperty()
+    remote_addr = ndb.StringProperty()    
+    url = ndb.StringProperty()
+    user_agent = ndb.StringProperty()
+    referer = ndb.StringProperty()
+    createtime = ndb.DateTimeProperty(auto_now_add=True)
+    
+class PostVisitLog(ndb.Model):   
+    post_id = ndb.IntegerProperty()
+    user = ndb.UserProperty()
+    remote_addr = ndb.StringProperty()    
+    url = ndb.StringProperty()
+    user_agent = ndb.StringProperty()
+    referer = ndb.StringProperty()
+    createtime = ndb.DateTimeProperty(auto_now_add=True) 
     
 class MyUtil():
   def renderLogin(self,uri):
@@ -98,7 +116,15 @@ class MyUtil():
     return content;
   def searchText(self,content,keyword):
     return None;
-  
+  def saveBlogViewLog(self,request,user,blog_id):
+    log = BlogVisitLog(blog_id = int(blog_id), user = user, remote_addr = request.remote_addr, url = request.url, user_agent = request.headers['User-Agent'], referer =request.headers['Referer'])
+    log.put()
+    return None;
+  def savePostViewLog(self,request,user,post_id):
+    log = PostVisitLog(post_id = int(post_id), user = user, remote_addr = request.remote_addr, url = request.url, user_agent = request.headers['User-Agent'], referer =request.headers['Referer'])
+    log.put()
+    return None;
+    
 class MainPage(webapp2.RequestHandler):
   def get(self):
     template_values={}
@@ -202,11 +228,13 @@ class EditBlog(webapp2.RequestHandler):
 
 class ViewBlog(webapp2.RequestHandler):
   def get(self,blog_id):
-    blog = ndb.Key(Blog, int(blog_id)).get()    
+    blog = ndb.Key(Blog, int(blog_id)).get()   
     if not blog:
         self.redirect("/")
     else:
         template_values={}
+        user = users.get_current_user()
+        MyUtil().saveBlogViewLog(self.request,user,blog_id)
         tag = self.request.get('tag')
         if not tag:
             qry =Post.query(Post.blog_id==blog.key.id()).order(-Post.publishdatetime)
@@ -318,6 +346,7 @@ class ViewPost(webapp2.RequestHandler):
     #post_id = id
     if post_id:
         post = ndb.Key(Post, int(post_id)).get()
+        MyUtil().savePostViewLog(self.request,user,post_id)
     else:
         template_values.update(MyUtil().renderAlert("Cannot find post by this id! Please try again later."))
         posts = Post.query(Post.owner==user).order(-Post.publishdatetime)
