@@ -6,6 +6,7 @@ import os
 import re
 import datetime
 import PyRSS2Gen as RSS2
+import logging
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -14,7 +15,11 @@ from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
 from google.appengine.api import search
+from google.appengine.api import mail
+from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 #from google.appengine.api import images
+
+
 
 #https://developers.google.com/appengine/docs/python/mail/receivingmail   Handling Incoming Email
 
@@ -25,7 +30,7 @@ class Blog(ndb.Model):
   owner = ndb.UserProperty()
   createtime = ndb.DateTimeProperty(auto_now_add=True)
 
-class Post(ndb.Model):  
+class Post(ndb.Model):
   post_title = ndb.StringProperty()
   blog_id = ndb.IntegerProperty()
   owner = ndb.UserProperty()
@@ -522,6 +527,46 @@ class Image(webapp2.RequestHandler):
         else:
             self.error(404)    
 
+class PostHandler(InboundMailHandler):
+    def receive(self, mail_message):        
+        sender = mail_message.sender
+        user = users.User(sender)
+        subject = mail_message.subject 
+        plaintext_bodies = mail_message.bodies('text/plain')
+        for content_type, body in plaintext_bodies:
+            body_text = body.decode()
+            break
+        
+        #logging.info("Received a message: " + body_text)
+        message = mail.EmailMessage(sender="Post on JingBlog <post@jingblogost.appspotmail.com>",
+                            subject="About your post on JingBlog")
+        message.to = sender
+        message.body = ""
+        blogs = Blog.query(Blog.owner==user).order(-Blog.createtime)
+        if blogs.count()>0:
+            if "@" in subject:
+                subjects = subject.split("@")
+                title = subjects[0]
+                blog_name = subjects[1]
+                blogs = Blog.query(Blog.owner==user,Blog.blogname==blog_name).order(-Blog.createtime)                
+                if blogs.count()>0:
+                    for thisblog in blogs.fetch(1):
+                        blog = thisblog
+                else:
+                    blog = Blog.query(Blog.owner==user).order(-Blog.createtime)[0]
+            else:
+                for thisblog in blogs.fetch(1):
+                    blog = thisblog
+            chunks, chunk_size = len(str(body_text)), 500
+            content_split = [ str(body_text)[i:i+chunk_size] for i in range(0, chunks, chunk_size) ]
+            #tag_split = [x.strip() for x in post_tags.split(',')]
+            post = Post(post_title=title,blog_id=blog.key.id(),owner=user,contents=content_split)
+            post.put()
+            message.body="Post posted on your blog "+blog.blogname+"\n"
+        else:
+            message.body="You don't have any blog yet. \nPlease create one on JingBlog Platform. \nView JingBlog Platform on "+self.request.host_url
+        message.send()
+        
 app = webapp2.WSGIApplication([
   ('/', MainPage),
   ('/addblog', AddBlog),
@@ -539,5 +584,6 @@ app = webapp2.WSGIApplication([
   ('/uploadphoto',UploadPhoto),
   ('/managephoto',ManagePhoto),
   (r'/deleteimg/([A-Za-z0-9\-]+)', DeletePhoto),
-  (r'/img/([A-Za-z0-9\-]+)',Image)
-])
+  (r'/img/([A-Za-z0-9\-]+)',Image),
+  PostHandler.mapping()
+], debug=True)

@@ -62,9 +62,15 @@ handlers:
   script: main.app
   login: required
   secure: always     
+- url: /_ah/mail/post@.*jingblogost\.appspotmail\.com
+  script: main.app
+  login: admin
 - url: .*
   script: main.app
 
+inbound_services:
+- mail
+  
 libraries:
 - name: webapp2
   version: "2.5.1"

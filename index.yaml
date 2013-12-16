@@ -12,6 +12,13 @@ indexes:
 
 - kind: Blog
   properties:
+  - name: blogname
+  - name: owner
+  - name: createtime
+    direction: desc
+
+- kind: Blog
+  properties:
   - name: owner
   - name: createtime
     direction: desc
