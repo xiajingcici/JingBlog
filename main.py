@@ -16,12 +16,10 @@ from google.appengine.ext import ndb
 from google.appengine.api import users
 from google.appengine.api import search
 from google.appengine.api import mail
-from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
+from google.appengine.ext.webapp.mail_handlers import InboundMailHandler 
+#https://developers.google.com/appengine/docs/python/mail/receivingmail   Handling Incoming Email
 #from google.appengine.api import images
 
-
-
-#https://developers.google.com/appengine/docs/python/mail/receivingmail   Handling Incoming Email
 
 class Blog(ndb.Model):
   #blog_id = ndb.IntegerProperty() #seems don't need, GAE will create a unique key id every time you insert a new row
@@ -112,18 +110,23 @@ class MyUtil():
     content = p2.sub(r'<img src="\1"/>',content)
     p1 = re.compile(r"[^src=\"](https?://[^\s]+)",re.I)
     content = p1.sub(r'<a href="\1" target="_blank">\1</a>',content)    
-    content = content.replace("\n", " <br/>");
+    content = content.replace("\n", " <br/>")
     return content;
   def searchText(self,content,keyword):
-    return None;
+    if str(keyword).lower() in str(content).lower():
+        #logging.info("Find: " + keyword+" in "+content)
+        return "yes"
+    else:
+        #logging.info("NOT Find: " + keyword+" in "+content)
+        return None
   def saveBlogViewLog(self,request,user,blog_id):
     log = BlogVisitLog(blog_id = int(blog_id), user = user, remote_addr = request.remote_addr, url = request.url, user_agent = request.headers['User-Agent'], referer =request.headers['Referer'])
     log.put()
-    return None;
+    return None
   def savePostViewLog(self,request,user,post_id):
     log = PostVisitLog(post_id = int(post_id), user = user, remote_addr = request.remote_addr, url = request.url, user_agent = request.headers['User-Agent'], referer =request.headers['Referer'])
     log.put()
-    return None;
+    return None
     
 class MainPage(webapp2.RequestHandler):
   def get(self):
@@ -253,29 +256,37 @@ class ViewBlog(webapp2.RequestHandler):
         search = self.request.get('search')
         if search:
             qry=Post.query(Post.blog_id==blog.key.id()).order(-Post.publishdatetime)
-            posts=[]
+            postsin=[]
             for post in qry:
                 thiscontent = "".join(post.contents)
                 if MyUtil().searchText(thiscontent,search):
-                    posts.append(post)
-            qry=posts
-        if qry.count(11) > 10:
-            old = self.request.get('old')
-            if old:
-                posts = qry.fetch(offset=10)
-                template_values.update({'blog':blog,'posts':posts,"old":old})
-            else:
-                posts = qry.fetch(10)
-                if tag:
-                    oldlink = self.request.uri+"&old=true"
+                    postsin.append(post)
+            if len(postsin)>0:
+                template_values.update({'posts':postsin})        
+            qry=None
+            template_values.update({'searchkeyword':search})        
+            #logging.info("qry: " + str(postsin))
+            #logging.info("qry: " + str(qry.count()))
+        if qry:
+            if qry.count(11) > 10:
+                old = self.request.get('old')
+                if old:
+                    posts = qry.fetch(offset=10)
+                    template_values.update({'blog':blog,'posts':posts,"old":old})
                 else:
-                    oldlink = self.request.uri+"?old=true"
-                template_values.update({'blog':blog,'posts':posts,'oldlink':oldlink})            
-        elif qry.count() == 0:
-            template_values.update({'blog':blog})
+                    posts = qry.fetch(10)
+                    if tag:
+                        oldlink = self.request.uri+"&old=true"
+                    else:
+                        oldlink = self.request.uri+"?old=true"
+                    template_values.update({'blog':blog,'posts':posts,'oldlink':oldlink})            
+            elif qry.count() == 0:
+                template_values.update({'blog':blog})
+            else:
+                posts = qry
+                template_values.update({'blog':blog,'posts':posts})        
         else:
-            posts = qry
-            template_values.update({'blog':blog,'posts':posts})        
+            template_values.update({'blog':blog})
         template_values.update(MyUtil().renderLogin(self.request.uri))
         template = jinja_environment.get_template('templete/viewblog.html')
         self.response.out.write(template.render(template_values))

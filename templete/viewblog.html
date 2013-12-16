@@ -110,7 +110,8 @@
 			{%if old%}<div class="col-md-4"><h3>These are the older posts.&nbsp;&nbsp;<br/><a href="/viewblog/{{blog.key.id()}}">View Latest 10 Posts.</a></div>{%endif%}
 			{%if tag_filter%}<div class="col-md-4"><h3>Filtered By Tag:</h3><br/>{{tag_filter}}&nbsp;&nbsp;<a href="/viewblog/{{blog.key.id()}}">Remove Filter</a></div>{%endif%}
 			
-			<div class="col-md-4"><h3>Tags:</h3><br/>{{tags_str}}</div>
+			<div class="col-md-4"><h3>Tags:</h3><br/>{{tags_str}}</div>			
+			{%if searchkeyword%}<div class="col-md-4"><h3>Filtered By Search Text:</h3><br/>{{searchkeyword}}&nbsp;&nbsp;<a href="/viewblog/{{blog.key.id()}}">Remove Filter</a></div>{%endif%}
 			<div class="col-md-4"><h3>Content Fulltext Search:</h3><br/>			
 				<div class="input-group">
 				  <input type="text" class="form-control" id="textsearch" name="textsearch" placeholder="Enter your search words"/>
@@ -119,8 +120,9 @@
 				  </span>
 				</div>
 			</div>
-		{%else%}
-			<div><h3>This blog has no post yet.</h3></div>
+		{%else%}			
+			<div class="col-md-8"><h3>This blog has no post yet.</h3></div>
+			{%if searchkeyword%}<div class="col-md-4"><h3>Filtered By Search Text:</h3><br/>"{{searchkeyword}}"&nbsp;&nbsp;<a href="/viewblog/{{blog.key.id()}}">Remove Filter</a></div>{%endif%}
 		{%endif%}
 		
       </div>
