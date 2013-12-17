@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<title>Manage Your Blogs</title>
+	<title>Statistics on Your Blogs</title>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">    
 	<meta name="google-translate-customization" content="6654e6f0b462e745-32bf5d8fbecee3af-gc0c7c86ec9dcbace-17"></meta>
     <!-- Latest compiled and minified CSS -->
@@ -65,46 +65,52 @@
         </div><!--/.nav-collapse -->
       </div>
     </div>
-	<script language="javascript" type="text/javascript">	
-	function _delete(id){
-		location = "/deleteimg/"+id
-	}
+	<script language="javascript" type="text/javascript">
 	function _view(id){
-		window.open("/img/"+id)
+		location = "/viewblog/"+id
+	}		
+	function _edit(id){		
+		location = "/editblog?id="+id
 	}
+	function _delete(id){
+		location = "/deleteblog?id="+id
+	}	
+	function _authuser(id){
+		location = "/authorizeblog/"+id
+	}
+	function _statistics(id){
+		location = "/statisticsblog/"+id
+	}	
 	</script>
 	<div class="container">
       <div class="starter-template">
-	    <h1>Manage Your Images</h1>
+	    <h1>Visit Statistics on Your Blogs</h1>
 		{{ notice_area }}
         <form role="form" action="" method=POST>
 		  <div class="form-group">
 			<table class="table table-hover">
-				<tr>
-					<th>#</th>
-					<th>Preview</th>
-					<th>Owner</th>
-					<th>CreateTime</th>
-					<th>Permalink</th>
-					<th colspan=2>Manage</th>
-				</tr>
-				{%if photos%}
-					{% set count = 1 %}
-					{%for photo in photos%}
+				<th>
+					<tr><td>Name</td><td>Total Count</td></tr>					
+				</th>
+				<tbody>
+				{%if blogs%}	
+					{%for blog in blogs%}
 						<tr>
-							<td>{{ count }}</td>
-							<td><img src="/img/{{photo.key()}}" width="85" height="85"></td>
-							<td>{{photo.owner}}</td>
-							<td>{{photo.createtime}}</td>
-							<td><a href="/img/{{photo.key()}}" target="_blank">{{domain}}/img/{{photo.key()}}</a></td>
-							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_view('{{photo.key()}}');return false;">View</a></td>
-							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_delete('{{photo.key()}}');return false;">Delete</a></td>
+							<td>Blog:<a href="/viewblog/{{blog.key.id()}}">{{blog.blogname}}</a></td>
+							<td>{{blog_count[blog.key.id()]}}</td>
 						</tr>
-						{% set count = count + 1 %}
+						{%set posts = blog_posts[blog.key.id()] %}
+						{%for post in posts%}
+							<tr>
+								<td>&nbsp;&nbsp;&nbsp;Post:<a href="/viewpost/{{post.key.id()}}">{{post.post_title}}</a></td>
+								<td>{{post_count[post.key.id()]}}</td>
+							</tr>
+						{%endfor%}
 					{%endfor%}
 				{%else%}
-				<tr><td colspan=7><B>You don't have any images yet. <a href="/uploadphoto">Add one Here!</a></B></td></tr>
+				<tr><td colspan=7><B>You don't have any blog yet. <a href="/addblog">Add one Here!</a></B></td></tr>
 				{%endif%}
+				</tbody>
 			</table>
 		  </div>		  
 		</form>

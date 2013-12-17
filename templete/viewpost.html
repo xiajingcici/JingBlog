@@ -36,6 +36,7 @@
                   <ul class="dropdown-menu">
                     <li><a href="/addblog">Create Blog</a></li>
                     <li><a href="/manageblog">Manage Blog</a></li>
+					<li><a href="/followedblog">Followed Blog</a></li>
                     <!--<li class="divider"></li>
                     <li class="dropdown-header">View Blog</li>
                     <li><a href="#">Separated link</a></li>
@@ -64,8 +65,16 @@
         </div><!--/.nav-collapse -->
       </div>
     </div>
+	<script language="javascript" type="text/javascript">
+	function _upvote(){
+		location = "/voteuppost/{{post.key.id()}}"
+	}		
+	function _downvote(){		
+		location = "/votedownpost/{{post.key.id()}}"
+	}
+	</script>	
 	<div class="container">
-
+		{{notice_area}}
       <div class="starter-template">
 	    <h1>{{post.post_title}}&nbsp;&nbsp;<small>&nbsp;&nbsp; on blog {{blog.blogname}}</small></h1>
 		<div class="info">
@@ -77,8 +86,12 @@
 		<div class="tags">
 			<pre>Tags:&nbsp;{{tags}}</pre>
 		</div>
+		<div class="thumbs">
+		<button type="button" class="btn btn-success" onclick="_upvote();return false;"><span id="likenum" class="badge">{%if like_num%}{{like_num}}{%else%}0{%endif%}</span>&nbsp;&nbsp;Like&nbsp;&nbsp;</button>
+		<button type="button" class="btn btn-danger" onclick="_downvote();return false;"><span id="notlikenum" class="badge">{%if notlike_num%}{{notlike_num}}{%else%}0{%endif%}</span>&nbsp;&nbsp;Don't Like&nbsp;</button>
+		</div>
 		{%if hasright%}
-		<div class="edit">			
+		<div class="edit">
 			<p class="lead"><a class="btn btn-primary btn-sm" role="button" href="/editpost/{{post.key.id()}}">Edit</a>&nbsp;<a class="btn btn-primary btn-sm" role="button" href="/deletepost/{{post.key.id()}}">Delete</a></p>
 		</div>
 		{%endif%}

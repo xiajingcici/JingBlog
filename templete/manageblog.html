@@ -36,6 +36,7 @@
                   <ul class="dropdown-menu">
                     <li><a href="/addblog">Create Blog</a></li>
                     <li><a href="/manageblog">Manage Blog</a></li>
+					<li><a href="/followedblog">Followed Blog</a></li>
                     <!--<li class="divider"></li>
                     <li class="dropdown-header">View Blog</li>
                     <li><a href="#">Separated link</a></li>
@@ -74,6 +75,12 @@
 	function _delete(id){
 		location = "/deleteblog?id="+id
 	}	
+	function _authuser(id){
+		location = "/authorizeblog/"+id
+	}
+	function _statistics(id){
+		location = "/statisticsblog"
+	}	
 	</script>
 	<div class="container">
       <div class="starter-template">
@@ -84,22 +91,24 @@
 			<table class="table table-hover">
 				<tr>
 					<th>#</th>
-					<th>Blog Name</th>
-					<th>Blog Url</th>					
+					<th>Blog Name</th>									
 					<th>Owner</th>
+					<th>Authorized users</th>
 					<th>CreateTime</th>
-					<th colspan=2>Manage</th>
+					<th colspan=4>Manage</th>
 				</tr>				
 				{%if blogs%}
 					{% set count = 1 %}
 					{%for blog in blogs%}
 						<tr>
 							<td>{{ count }}</td>
-							<td>{{blog.blogname}}</td>
-							<td>{{blog.blog_url}}</td>
+							<td>{{blog.blogname}}</td>							
 							<td>{{blog.owner}}</td>
+							<td>{{blog.users|join(", ")}}</td>
 							<td>{{blog.createtime}}</td>
 							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_view({{blog.key.id()}});return false;">View</a></td>
+							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_authuser({{blog.key.id()}});return false;">Authorize User</a></td>
+							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_statistics({{blog.key.id()}});return false;">Statistics</a></td>
 							<!--<td><a href="#" class="btn btn-primary btn-xs" role="button" disabled onclick="_edit({{blog.key.id()}});return false;">Edit</a></td>-->
 							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_delete({{blog.key.id()}});return false;">Delete</a></td>
 						</tr>

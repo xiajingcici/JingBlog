@@ -61,7 +61,23 @@ handlers:
 - url: /deletephoto
   script: main.app
   login: required
-  secure: always     
+  secure: always  
+- url: /authorizeblog
+  script: main.app
+  login: required
+  secure: always 
+- url: /followedblog
+  script: main.app
+  login: required
+  secure: always
+- url: /statisticsblog
+  script: main.app
+  login: required
+  secure: always    
+- url: /followblog
+  script: main.app
+  login: required
+  secure: always
 - url: /_ah/mail/post@.*jingblogost\.appspotmail\.com
   script: main.app
   login: admin

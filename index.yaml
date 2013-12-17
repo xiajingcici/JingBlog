@@ -23,6 +23,12 @@ indexes:
   - name: createtime
     direction: desc
 
+- kind: Blog
+  properties:
+  - name: users
+  - name: createtime
+    direction: desc
+
 - kind: Greeting
   ancestor: yes
   properties:

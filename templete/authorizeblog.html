@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<title>Manage Your Blogs</title>
+	<title>Add your Blog on JingBlog</title>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">    
-	<meta name="google-translate-customization" content="6654e6f0b462e745-32bf5d8fbecee3af-gc0c7c86ec9dcbace-17"></meta>
+    <meta name="google-translate-customization" content="6654e6f0b462e745-32bf5d8fbecee3af-gc0c7c86ec9dcbace-17"></meta>		
     <!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="/templete/css/bootstrap.min.css">
 	<!-- Optional theme -->
@@ -56,7 +56,7 @@
                     <li><a href="/uploadphoto">Upload Image</a></li>
                     <li><a href="/managephoto">Manage Images</a></li>
                   </ul>
-            </li>			
+            </li>
           </ul>
 		  <ul class="nav navbar-nav pull-right">
             <li><a href="">{{ greeting }}</a></li>
@@ -65,48 +65,20 @@
         </div><!--/.nav-collapse -->
       </div>
     </div>
-	<script language="javascript" type="text/javascript">	
-	function _delete(id){
-		location = "/deleteimg/"+id
-	}
-	function _view(id){
-		window.open("/img/"+id)
-	}
-	</script>
 	<div class="container">
+
       <div class="starter-template">
-	    <h1>Manage Your Images</h1>
+	    <h1>Authorize user to your blog</h1>
 		{{ notice_area }}
-        <form role="form" action="" method=POST>
+        <form role="form" action="/authorizeblog/{{blog.key.id()}}" method=POST>
 		  <div class="form-group">
-			<table class="table table-hover">
-				<tr>
-					<th>#</th>
-					<th>Preview</th>
-					<th>Owner</th>
-					<th>CreateTime</th>
-					<th>Permalink</th>
-					<th colspan=2>Manage</th>
-				</tr>
-				{%if photos%}
-					{% set count = 1 %}
-					{%for photo in photos%}
-						<tr>
-							<td>{{ count }}</td>
-							<td><img src="/img/{{photo.key()}}" width="85" height="85"></td>
-							<td>{{photo.owner}}</td>
-							<td>{{photo.createtime}}</td>
-							<td><a href="/img/{{photo.key()}}" target="_blank">{{domain}}/img/{{photo.key()}}</a></td>
-							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_view('{{photo.key()}}');return false;">View</a></td>
-							<td><a href="#" class="btn btn-primary btn-xs" role="button"  onclick="_delete('{{photo.key()}}');return false;">Delete</a></td>
-						</tr>
-						{% set count = count + 1 %}
-					{%endfor%}
-				{%else%}
-				<tr><td colspan=7><B>You don't have any images yet. <a href="/uploadphoto">Add one Here!</a></B></td></tr>
-				{%endif%}
-			</table>
-		  </div>		  
+			<p class="lead">Blog Name:&nbsp;{{blog.blogname}}</p>
+			<p class="lead">Blog Short Description:&nbsp;{{blog.blog_desc}}</p>
+			<label for="email">Authorize user:</label>
+			<input type="email" class="form-control" id="email" name="email" placeholder="Enter the user email address" required>
+			<span class="help-block">Enter the user email that you want he/she to use your blog.</span>
+		  </div>
+		  <button type="submit" class="btn btn-default">Submit</button>
 		</form>
       </div>
 	  <hr>
@@ -119,6 +91,7 @@
 			}
 			</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 			</p>
+			
 	  </footer>
     </div><!-- /.container -->
 	

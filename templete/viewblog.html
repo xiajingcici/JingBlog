@@ -36,6 +36,7 @@
                   <ul class="dropdown-menu">
                     <li><a href="/addblog">Create Blog</a></li>
                     <li><a href="/manageblog">Manage Blog</a></li>
+					<li><a href="/followedblog">Followed Blog</a></li>
                     <!--<li class="divider"></li>
                     <li class="dropdown-header">View Blog</li>
                     <li><a href="#">Separated link</a></li>
@@ -76,8 +77,12 @@
 	function _rss(){
 		window.open("/rssblog/{{blog.key.id()}}")
 	}
+	function _follow(){
+		location ="/followblog/{{blog.key.id()}}"
+	}
 	</script>
       <div class="starter-template row">
+		{{notice_area}}
 	    <h1>{{blog.blogname}}&nbsp;&nbsp;<small>&nbsp;&nbsp; owned by {{blog.owner}}</small></h1>
 		
 		{%if posts%}
@@ -85,7 +90,7 @@
 			{%for post in posts%}
 			<div class="title">
 			<h3>{{post.post_title}}</h3>
-			</div>		
+			</div>
 			<div class="info">
 				<pre>Author:&nbsp;{{post.owner}}&nbsp;&nbsp;|&nbsp;Published On:&nbsp;{{post.publishdatetime}}&nbsp;&nbsp;{% if post.editor %}|&nbsp;Editor:&nbsp;{{post.editor}}&nbsp;&nbsp;{% endif %}{% if post.lastmodifydatetime %}|&nbsp;Last Modified Time:&nbsp;{{post.lastmodifydatetime}}&nbsp;&nbsp;{% endif %}</pre>
 			</div>
@@ -102,8 +107,13 @@
 			</div>
 			{%endif%}
 			</div>
-			<div class="col-md-4">
-				<button type="button" class="btn btn-default" onclick="_rss();return false;">
+			<div class="col-md-2">
+				<button type="button" class="btn btn-primary" onclick="_follow();return false;">
+				  Follow this blog
+				</button>
+			</div>
+			<div class="col-md-2">
+				<button type="button" class="btn btn-info" onclick="_rss();return false;">
 				  RSS for this blog
 				</button>
 			</div>
@@ -120,9 +130,11 @@
 				  </span>
 				</div>
 			</div>
-		{%else%}			
+			{%if blog.users%}<div class="col-md-4"><h3>Authorized Users for this Blog:</h3><br/>"{{blog.users|join("<BR/>")}}"</div>{%endif%}
+		{%else%}
 			<div class="col-md-8"><h3>This blog has no post yet.</h3></div>
 			{%if searchkeyword%}<div class="col-md-4"><h3>Filtered By Search Text:</h3><br/>"{{searchkeyword}}"&nbsp;&nbsp;<a href="/viewblog/{{blog.key.id()}}">Remove Filter</a></div>{%endif%}
+			{%if blog.users%}<div class="col-md-4"><h3>Authorized Users for this Blog:</h3><br/>"{{blog.users|join("<BR/>")}}"</div>{%endif%}
 		{%endif%}
 		
       </div>
