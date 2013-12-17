@@ -807,7 +807,7 @@ app = webapp2.WSGIApplication([
   ('/editblog', EditBlog),
   (r'/viewblog/(\d+)', ViewBlog),
   ('/statisticsblog', StatBlog),  
-  (r'/rssblog/(\d+)', RssBlog),
+  #(r'/rssblog/(\d+)', RssBlog),
   (r'/followblog/(\d+)', FollowBlog),  
   (r'/authorizeblog/(\d+)', AuthorizeBlog),
   ('/addpost', AddPost),
